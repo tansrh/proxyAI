@@ -24,7 +24,7 @@ app.post('/proxy', async (req: Request, res: Response) => {
     const response = await axios.post(
       'https://openrouter.ai/api/v1/chat/completions',
       {
-        model: 'deepseek-chat',
+  model: 'deepseek/deepseek-r1-0528:free',
         messages,
         ...rest
       },
@@ -37,7 +37,11 @@ app.post('/proxy', async (req: Request, res: Response) => {
     );
     res.status(200).json({ success: true, response: response.data });
   } catch (error: any) {
-    res.status(500).json({ error: error.message });
+    if (error.response) {
+      res.status(500).json({ error: error.response.data });
+    } else {
+      res.status(500).json({ error: error.message });
+    }
   }
 });
 
