@@ -1,4 +1,3 @@
-
 import 'dotenv/config';
 import express, {Request, Response} from 'express';
 import axios from 'axios';
@@ -35,7 +34,8 @@ app.post('/proxy', async (req: Request, res: Response) => {
         },
       }
     );
-    res.status(200).json({ success: true, response: response.data });
+    const content = response.data.choices?.[0]?.message?.content ?? null;
+res.status(200).json({ success: true, content });
   } catch (error: any) {
     if (error.response) {
       res.status(500).json({ error: error.response.data });
