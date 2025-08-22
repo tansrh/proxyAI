@@ -1,14 +1,12 @@
 
 import 'dotenv/config';
 import express, {Request, Response} from 'express';
-import OpenAI from 'openai';
+import axios from 'axios';
 
 const app = express();
 app.use(express.json());
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+
 
 app.post('/proxy', async (req: Request, res: Response) => {
   try {
@@ -19,12 +17,25 @@ app.post('/proxy', async (req: Request, res: Response) => {
     const messages = [
       { role: 'user', content: prompt }
     ];
-    const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
-      messages,
-      ...rest
-    });
-    res.status(200).json({success: true, response});
+    const apiKey = process.env.OPENROUTER_API_KEY;
+    if (!apiKey) {
+      return res.status(500).json({ success: false, error: 'Missing OpenRouter API key.' });
+    }
+    const response = await axios.post(
+      'https://openrouter.ai/api/v1/chat/completions',
+      {
+        model: 'deepseek-chat',
+        messages,
+        ...rest
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    res.status(200).json({ success: true, response: response.data });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
