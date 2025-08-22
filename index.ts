@@ -36,8 +36,19 @@ app.post('/proxy', async (req: Request, res: Response) => {
         },
       }
     );
-    const content = response.data.choices?.[0]?.message?.content ?? null;
-res.status(200).json({ success: true, content });
+    let content = response.data.choices?.[0]?.message?.content ?? null;
+    if (content) {
+      // Remove Markdown code block if present
+      content = content.replace(/^```(?:json)?\n?([\s\S]*?)```$/g, '$1').trim();
+      try {
+        const parsed = JSON.parse(content);
+        res.status(200).json({ success: true, content: parsed });
+      } catch {
+        res.status(200).json({ success: true, content }); // fallback: return as string
+      }
+    } else {
+      res.status(200).json({ success: true, content: null });
+    }
   } catch (error: any) {
     if (error.response) {
       res.status(500).json({ error: error.response.data });
