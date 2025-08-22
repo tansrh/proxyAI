@@ -6,7 +6,9 @@ const app = express();
 app.use(express.json());
 
 
-
+app.get('/', async (req: Request, res: Response) => {
+  res.status(200).json({success: true, message: 'Proxy server is running.'});
+})
 app.post('/proxy', async (req: Request, res: Response) => {
   try {
     const { prompt, ...rest } = req.body;
