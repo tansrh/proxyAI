@@ -1,6 +1,6 @@
 
 import 'dotenv/config';
-import express from 'express';
+import express, {Request, Response} from 'express';
 import OpenAI from 'openai';
 
 const app = express();
@@ -10,7 +10,7 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-app.post('/proxy', async (req, res) => {
+app.post('/proxy', async (req: Request, res: Response) => {
   try {
     const { prompt, ...rest } = req.body;
     if (!prompt) {
